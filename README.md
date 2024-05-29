@@ -10,7 +10,7 @@ This script, likely to be renamed down the road (TODO), takes a list of plugins 
 * `& = Not found in UC`
 * `! = Older than tables-to-divs change - this should be removed!`
 * `@ = The latest version of this plugin requires a newer core than you're targeting, so do manual work to figure out the version to target`
-* `* = This plugin is part of the CloudBees Assurance Plugin and will auto-update assuming Beekeeper is installed and active`
+* `* = This plugin is part of the CloudBees Assurance Plugin and should auto-update assuming Beekeeper is installed and active`
 
 ### TODO
 * Add option for CSV output
