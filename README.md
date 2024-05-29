@@ -8,7 +8,7 @@ This script, likely to be renamed down the road (TODO), takes a list of plugins 
 * `$ = Ready for upgrade after core update`
 * `% = No update necessary based on target version`
 * `& = Not found in UC`
-* `! = Older than tables-to-divs change - this should be removed!`
+* `! = Older than tables-to-divs change - this should be probably be removed! Do some research to check if it is impacted by this major breaking change to Jenkins core`
 * `@ = The latest version of this plugin requires a newer core than you're targeting, so do manual work to figure out the version to target`
 * `* = This plugin is part of the CloudBees Assurance Plugin and should auto-update assuming Beekeeper is installed and active`
 
