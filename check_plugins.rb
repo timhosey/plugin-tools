@@ -38,7 +38,7 @@ def check_for_update(start_ver, target_ver, plugin_name, json)
 end
 
 unless File.exists?("uc.json")
-  http_download_uri("https://jenkins-updates.cloudbees.com/update-center.json", "uc.json")
+  http_download_uri("https://jenkins-updates.cloudbees.com/update-center.json?version=#{target_version}", "uc.json")
   trimmed = system('sed', '-i', 'uc.bak', '1d;$d', 'uc.json')
   
 else
