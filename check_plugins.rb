@@ -5,6 +5,7 @@ require 'JSON'
 require 'csv'
 
 # This should be externalized somehow as a param
+file_name = 'analysis.json'
 current_version = '2.346.4.1'
 target_version = '2.414.1.4'
 
@@ -52,46 +53,89 @@ def download_json(version)
   end 
 end
 
+# Return if it's JSON or text
+def get_plugins_list_type(filename)
+  def valid_json?(json)
+    JSON.parse(json)
+    return 'json'
+  rescue JSON::ParserError, TypeError => e
+    return 'text'
+  end
+end
+
 # Download the target version JSON
 download_json(target_version)
 # Download the JSON for the current version
 download_json(current_version)
 
+# Read the JSON files
 target_json = JSON.parse(File.read("uc-#{target_version}.json"))
-File.open("active.txt", "r") do |file_handle|
-  file_handle.each_line do |plugin|
-    p_split = plugin.split(":")
-    p_name = p_split[0]
-    p_ver = p_split[1]
-    #puts "NAME: #{p_name}, VER: #{p_ver}"
-    begin
-      target_remote_ver = target_json["plugins"][p_name]["version"]
-      target_required_core = target_json["plugins"][p_name]["requiredCore"]
-    rescue => e
-      File.open('new_vers.txt', 'a') do |ver_file|
-        ver_file.puts "& Plugin #{p_name} not found in Update Center. Skipping..."
-      end
-      next
-    end
-    if target_remote_ver.chomp != p_ver.chomp
-      File.open('new_vers.txt', 'a') do |ver_file|
-        if (target_required_core.chomp < "2.277.2.1")
-          ver_file.puts "! #{p_name} is only supported on versions older than tables-to-divs! It is HIGHLY recommended this plugin be removed for compatibility and security concerns. [req_core] #{target_required_core}"
-        elsif (target_required_core.chomp > target_version)
-          ver_file.puts "@ #{p_name} requires a version greater than the target of #{target_version}. Manually validate the version needed for install. [req_core] #{target_required_core}"
-        else
-          ver_file.puts check_for_update(p_ver, target_remote_ver, p_name, p_json)
-        end
-      end
-    end
+current_json = JSON.parse(File.read("uc-#{current_version}.json"))
+
+# CSV headers
+headers = ["plugin_name", "plugin_id", "in_uc_#{current_version}", "in_uc_#{target_version}"]
+
+# If we get JSON back...
+if get_plugins_list_type(file_name) == 'json'
+  # TODO: Loop JSON entries.
+  # Check if target version is in UC
+  begin
+    target_remote_ver = target_json["plugins"][p_name]["version"]
+    target_required_core = target_json["plugins"][p_name]["requiredCore"]
+  rescue => e
+    puts "[#{target_version}][NOT_IN_UC] Plugin #{p_name} not found in Update Center. Skipping..."
+    next
   end
+
+  # Check if current version is in UC
+  begin
+    current_remote_ver = current_json["plugins"][p_name]["version"]
+    current_required_core = current_json["plugins"][p_name]["requiredCore"]
+  rescue => e
+    puts "[#{target_version}][NOT_IN_UC] Plugin #{p_name} not found in Update Center. Skipping..."
+    next
+  end
+
+# Assuming text
+else
+  puts 'Text file detected. Ending.'
+  exit
 end
 
-#films_info is an array of arrays
+puts
+# File.open("active.txt", "r") do |file_handle|
+#   file_handle.each_line do |plugin|
+#     p_split = plugin.split(":")
+#     p_name = p_split[0]
+#     p_ver = p_split[1]
+#     #puts "NAME: #{p_name}, VER: #{p_ver}"
+#     begin
+#       target_remote_ver = target_json["plugins"][p_name]["version"]
+#       target_required_core = target_json["plugins"][p_name]["requiredCore"]
+#     rescue => e
+#       File.open('new_vers.txt', 'a') do |ver_file|
+#         ver_file.puts "& Plugin #{p_name} not found in Update Center. Skipping..."
+#       end
+#       next
+#     end
+#     if target_remote_ver.chomp != p_ver.chomp
+#       File.open('new_vers.txt', 'a') do |ver_file|
+#         if (target_required_core.chomp < "2.277.2.1")
+#           ver_file.puts "! #{p_name} is only supported on versions older than tables-to-divs! It is HIGHLY recommended this plugin be removed for compatibility and security concerns. [req_core] #{target_required_core}"
+#         elsif (target_required_core.chomp > target_version)
+#           ver_file.puts "@ #{p_name} requires a version greater than the target of #{target_version}. Manually validate the version needed for install. [req_core] #{target_required_core}"
+#         else
+#           ver_file.puts check_for_update(p_ver, target_remote_ver, p_name, p_json)
+#         end
+#       end
+#     end
+#   end
+# end
 
-CSV.open("new_films.csv", "w") do |csv|
-  csv << headers
-  films_info.each do |movie|
-    csv << movie
-  end
-end
+# Output our CSV to a file
+# CSV.open("plugin_updates.csv", "w") do |csv|
+#   csv << headers
+#   plugin_info.each do |plugin_detail|
+#     csv << plugin_detail
+#   end
+# end
