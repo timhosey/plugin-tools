@@ -2,11 +2,13 @@
 
 require 'open-uri'
 require 'JSON'
+require 'csv'
 
 # This should be externalized somehow as a param
 current_version = '2.346.4.1'
 target_version = '2.414.1.4'
 
+# Downloading files
 def http_download_uri(uri, filename)
   puts "Starting HTTP download for: " + uri.to_s
   File.open(filename.to_s, "wb") do |saved_file|
@@ -18,6 +20,7 @@ def http_download_uri(uri, filename)
   puts "Stored download as " + filename + "."
 end
 
+# Validate whether or not it's in CAP
 def check_if_cap(plugin_name, json)
   begin
     checker = json["offeredEnvelope"]["plugins"][plugin_name]["artifactId"]
@@ -27,6 +30,7 @@ def check_if_cap(plugin_name, json)
   end
 end
 
+ # Get if there's an update that we can install either post- or pre-upgrade
 def check_for_update(start_ver, target_ver, plugin_name, json)
   in_cap = check_if_cap(plugin_name, json)
   icon = in_cap ? "*" : ""
@@ -37,7 +41,9 @@ def check_for_update(start_ver, target_ver, plugin_name, json)
   end
 end
 
+# Downloads JSON files from CB UC
 def download_json(version)
+  # Check to see if we've already downloaded this JSON; download if not
   unless File.exists?("uc-#{version}.json")
     http_download_uri("https://jenkins-updates.cloudbees.com/update-center.json?version=#{version}", "uc-#{version}.json")
     trimmed = system('sed', '-i', 'uc.bak', '1d;$d', "uc-#{version}.json")
@@ -46,7 +52,9 @@ def download_json(version)
   end 
 end
 
+# Download the target version JSON
 download_json(target_version)
+# Download the JSON for the current version
 download_json(current_version)
 
 target_json = JSON.parse(File.read("uc-#{target_version}.json"))
@@ -76,5 +84,14 @@ File.open("active.txt", "r") do |file_handle|
         end
       end
     end
+  end
+end
+
+#films_info is an array of arrays
+
+CSV.open("new_films.csv", "w") do |csv|
+  csv << headers
+  films_info.each do |movie|
+    csv << movie
   end
 end
