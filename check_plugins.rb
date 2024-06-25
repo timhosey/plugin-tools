@@ -37,15 +37,19 @@ def check_for_update(start_ver, target_ver, plugin_name, json)
   end
 end
 
-unless File.exists?("uc.json")
-  http_download_uri("https://jenkins-updates.cloudbees.com/update-center.json?version=#{target_version}", "uc.json")
-  trimmed = system('sed', '-i', 'uc.bak', '1d;$d', 'uc.json')
-  
-else
-  puts "Skipping download of JSON."
-end 
+def download_json(version)
+  unless File.exists?("uc-#{version}.json")
+    http_download_uri("https://jenkins-updates.cloudbees.com/update-center.json?version=#{version}", "uc-#{version}.json")
+    trimmed = system('sed', '-i', 'uc.bak', '1d;$d', "uc-#{version}.json")
+  else
+    puts "Skipping download of JSON for version #{version} as it already has been downloaded."
+  end 
+end
 
-p_json = JSON.parse(File.read('uc.json'))
+download_json(target_version)
+download_json(current_version)
+
+target_json = JSON.parse(File.read("uc-#{target_version}.json"))
 File.open("active.txt", "r") do |file_handle|
   file_handle.each_line do |plugin|
     p_split = plugin.split(":")
@@ -53,22 +57,22 @@ File.open("active.txt", "r") do |file_handle|
     p_ver = p_split[1]
     #puts "NAME: #{p_name}, VER: #{p_ver}"
     begin
-      p_remote_ver = p_json["plugins"][p_name]["version"]
-      p_required_core = p_json["plugins"][p_name]["requiredCore"]
+      target_remote_ver = target_json["plugins"][p_name]["version"]
+      target_required_core = target_json["plugins"][p_name]["requiredCore"]
     rescue => e
       File.open('new_vers.txt', 'a') do |ver_file|
         ver_file.puts "& Plugin #{p_name} not found in Update Center. Skipping..."
       end
       next
     end
-    if p_remote_ver.chomp != p_ver.chomp
+    if target_remote_ver.chomp != p_ver.chomp
       File.open('new_vers.txt', 'a') do |ver_file|
-        if (p_required_core.chomp < "2.277.2.1")
-          ver_file.puts "! #{p_name} is only supported on versions older than tables-to-divs! It is HIGHLY recommended this plugin be removed for compatibility and security concerns. [req_core] #{p_required_core}"
-        elsif (p_required_core.chomp > target_version)
-          ver_file.puts "@ #{p_name} requires a version greater than the target of #{target_version}. Manually validate the version needed for install. [req_core] #{p_required_core}"
+        if (target_required_core.chomp < "2.277.2.1")
+          ver_file.puts "! #{p_name} is only supported on versions older than tables-to-divs! It is HIGHLY recommended this plugin be removed for compatibility and security concerns. [req_core] #{target_required_core}"
+        elsif (target_required_core.chomp > target_version)
+          ver_file.puts "@ #{p_name} requires a version greater than the target of #{target_version}. Manually validate the version needed for install. [req_core] #{target_required_core}"
         else
-          ver_file.puts check_for_update(p_ver, p_remote_ver, p_name, p_json)
+          ver_file.puts check_for_update(p_ver, target_remote_ver, p_name, p_json)
         end
       end
     end
