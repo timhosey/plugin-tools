@@ -12,6 +12,15 @@ This script, likely to be renamed down the road (TODO), takes a list of plugins 
 * `@ = The latest version of this plugin requires a newer core than you're targeting, so do manual work to figure out the version to target`
 * `* = This plugin is part of the CloudBees Assurance Plugin and should auto-update assuming Beekeeper is installed and active`
 
+### How to export plugin list
+Use the following script to generate a copy-pastable plaintext output of the plugins. Run this from the Script Console of the controller.
+```
+Jenkins.instance.pluginManager.plugins.each{
+  plugin -> 
+    println ("${plugin.getShortName()}:${plugin.getVersion()}")
+}
+```
+
 ### TODO
 * Add option for CSV output
 * CAP comparison - did a plugin move to or from CAP between versions?
