@@ -5,9 +5,9 @@ require 'JSON'
 require 'csv'
 
 # This should be externalized somehow as a param
-file_name = 'analysis.json'
-current_version = '2.346.4.1'
-target_version = '2.414.1.4'
+file_name = 'active.txt'
+current_version = '2.401.1.3'
+target_version = '2.452.2.3'
 
 # Downloading files
 def http_download_uri(uri, filename)
@@ -54,6 +54,7 @@ def download_json(version)
 end
 
 # Return if it's JSON or text
+# TODO: Determine if this is necessary
 def get_plugins_list_type(filename)
   def valid_json?(json)
     JSON.parse(json)
@@ -62,6 +63,9 @@ def get_plugins_list_type(filename)
     return 'text'
   end
 end
+
+# Startup ASCII ftw
+File.foreach("analysis.txt") { |line| puts line }
 
 # Download the target version JSON
 download_json(target_version)
@@ -73,36 +77,71 @@ target_json = JSON.parse(File.read("uc-#{target_version}.json"))
 current_json = JSON.parse(File.read("uc-#{current_version}.json"))
 
 # CSV headers
-headers = ["plugin_name", "plugin_id", "in_uc_#{current_version}", "in_uc_#{target_version}"]
+headers = ["plugin_id", "installed_ver", "new_ver_#{current_version}", "new_ver_#{target_version}", "in_uc_#{current_version}", "in_uc_#{target_version}"]
 
-# If we get JSON back...
-if get_plugins_list_type(file_name) == 'json'
-  # TODO: Loop JSON entries.
+# Delete the CSV before starting.
+File.delete("plugin_updates.csv") if File.exist?("plugin_updates.csv")
+
+# Open CSV for writing
+csv = CSV.open("plugin_updates.csv", "w")
+
+# Add headers
+csv << headers
+
+# Get file content to string
+plugin_list = File.read(file_name)
+
+# Set our plugin_info array to empty
+plugin_info = []
+
+# TODO: Loop plugin entries.
+plugin_list.each_line do |plugin|
+  # This will determine whether we're going to analyze any deeper
+  continue_target = true
+  continue_current = true
+
+  # Split each entry into two parts from the colon
+  p_split = plugin.split(":")
+  p_id = p_split[0]
+  p_ver = p_split[1]
+
   # Check if target version is in UC
   begin
-    target_remote_ver = target_json["plugins"][p_name]["version"]
-    target_required_core = target_json["plugins"][p_name]["requiredCore"]
+    target_plugin_ver = target_json["plugins"][p_id]["version"]
+    target_required_core = target_json["plugins"][p_id]["requiredCore"]
   rescue => e
-    puts "[#{target_version}][NOT_IN_UC] Plugin #{p_name} not found in Update Center. Skipping..."
-    next
+    puts "[#{target_version}][NOT_IN_UC] Plugin #{p_id} not found in Update Center for #{target_version}. Skipping..."
+    continue_target = false
   end
 
   # Check if current version is in UC
   begin
-    current_remote_ver = current_json["plugins"][p_name]["version"]
-    current_required_core = current_json["plugins"][p_name]["requiredCore"]
+    current_plugin_ver = current_json["plugins"][p_id]["version"]
+    current_required_core = current_json["plugins"][p_id]["requiredCore"]
   rescue => e
-    puts "[#{target_version}][NOT_IN_UC] Plugin #{p_name} not found in Update Center. Skipping..."
-    next
+    puts "[#{current_version}][NOT_IN_UC] Plugin #{p_id} not found in Update Center for #{current_version}. Skipping..."
+    continue_current = false
   end
 
-# Assuming text
-else
-  puts 'Text file detected. Ending.'
-  exit
+  # ====================================
+  # Start analysis of versions and cores
+  # ====================================
+
+  if (continue_current)
+    current_ver_diff = (current_plugin_ver.to_s > p_ver.chomp) ? current_plugin_ver : "n/a"
+  end
+
+  if (continue_target)
+    target_ver_diff = (target_plugin_ver.to_s > p_ver.chomp) ? target_plugin_ver : "n/a"
+  end
+
+  # Output our CSV to a file
+  csv << [p_id, current_plugin_ver, current_ver_diff.to_s, target_ver_diff.to_s, continue_target.to_s, continue_current.to_s]
 end
 
-puts
+# Close the CSV for writing
+csv.close
+
 # File.open("active.txt", "r") do |file_handle|
 #   file_handle.each_line do |plugin|
 #     p_split = plugin.split(":")
@@ -129,13 +168,5 @@ puts
 #         end
 #       end
 #     end
-#   end
-# end
-
-# Output our CSV to a file
-# CSV.open("plugin_updates.csv", "w") do |csv|
-#   csv << headers
-#   plugin_info.each do |plugin_detail|
-#     csv << plugin_detail
 #   end
 # end
