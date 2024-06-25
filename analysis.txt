@@ -1,0 +1,53 @@
+
+                                                                                                                                           
+                                                                                                                                           
+                         PPPPPPPPPPPPPPPPP   lllllll                                         iiii                                          
+                         P::::::::::::::::P  l:::::l                                        i::::i                                         
+                         P::::::PPPPPP:::::P l:::::l                                         iiii                                          
+                         PP:::::P     P:::::Pl:::::l                                                                                       
+                           P::::P     P:::::P l::::l uuuuuu    uuuuuu     ggggggggg   gggggiiiiiiinnnn  nnnnnnnn                           
+                           P::::P     P:::::P l::::l u::::u    u::::u    g:::::::::ggg::::gi:::::in:::nn::::::::nn                         
+                           P::::PPPPPP:::::P  l::::l u::::u    u::::u   g:::::::::::::::::g i::::in::::::::::::::nn                        
+                           P:::::::::::::PP   l::::l u::::u    u::::u  g::::::ggggg::::::gg i::::inn:::::::::::::::n                       
+                           P::::PPPPPPPPP     l::::l u::::u    u::::u  g:::::g     g:::::g  i::::i  n:::::nnnn:::::n                       
+                           P::::P             l::::l u::::u    u::::u  g:::::g     g:::::g  i::::i  n::::n    n::::n                       
+                           P::::P             l::::l u::::u    u::::u  g:::::g     g:::::g  i::::i  n::::n    n::::n                       
+                           P::::P             l::::l u:::::uuuu:::::u  g::::::g    g:::::g  i::::i  n::::n    n::::n                       
+                         PP::::::PP          l::::::lu:::::::::::::::uug:::::::ggggg:::::g i::::::i n::::n    n::::n                       
+                         P::::::::P          l::::::l u:::::::::::::::u g::::::::::::::::g i::::::i n::::n    n::::n                       
+                         P::::::::P          l::::::l  uu::::::::uu:::u  gg::::::::::::::g i::::::i n::::n    n::::n                       
+                         PPPPPPPPPP          llllllll    uuuuuuuu  uuuu    gggggggg::::::g iiiiiiii nnnnnn    nnnnnn                       
+                                                                                   g:::::g                                                 
+                                                                       gggggg      g:::::g                                                 
+                                                                       g:::::gg   gg:::::g                                                 
+                                                                        g::::::ggg:::::::g                                                 
+                                                                         gg:::::::::::::g                                                  
+                                                                           ggg::::::ggg                                                    
+                                                                              gggggg                                                       
+                                                                                                                                           
+                                                                                                                                           
+               AAA                                                 lllllll                                          iiii                   
+              A:::A                                                l:::::l                                         i::::i                  
+             A:::::A                                               l:::::l                                          iiii                   
+            A:::::::A                                              l:::::l                                                                 
+           A:::::::::A         nnnn  nnnnnnnn      aaaaaaaaaaaaa    l::::lyyyyyyy           yyyyyyy  ssssssssss   iiiiiii     ssssssssss   
+          A:::::A:::::A        n:::nn::::::::nn    a::::::::::::a   l::::l y:::::y         y:::::y ss::::::::::s  i:::::i   ss::::::::::s  
+         A:::::A A:::::A       n::::::::::::::nn   aaaaaaaaa:::::a  l::::l  y:::::y       y:::::yss:::::::::::::s  i::::i ss:::::::::::::s 
+        A:::::A   A:::::A      nn:::::::::::::::n           a::::a  l::::l   y:::::y     y:::::y s::::::ssss:::::s i::::i s::::::ssss:::::s
+       A:::::A     A:::::A       n:::::nnnn:::::n    aaaaaaa:::::a  l::::l    y:::::y   y:::::y   s:::::s  ssssss  i::::i  s:::::s  ssssss 
+      A:::::AAAAAAAAA:::::A      n::::n    n::::n  aa::::::::::::a  l::::l     y:::::y y:::::y      s::::::s       i::::i    s::::::s      
+     A:::::::::::::::::::::A     n::::n    n::::n a::::aaaa::::::a  l::::l      y:::::y:::::y          s::::::s    i::::i       s::::::s   
+    A:::::AAAAAAAAAAAAA:::::A    n::::n    n::::na::::a    a:::::a  l::::l       y:::::::::y     ssssss   s:::::s  i::::i ssssss   s:::::s 
+   A:::::A             A:::::A   n::::n    n::::na::::a    a:::::a l::::::l       y:::::::y      s:::::ssss::::::si::::::is:::::ssss::::::s
+  A:::::A               A:::::A  n::::n    n::::na:::::aaaa::::::a l::::::l        y:::::y       s::::::::::::::s i::::::is::::::::::::::s 
+ A:::::A                 A:::::A n::::n    n::::n a::::::::::aa:::al::::::l       y:::::y         s:::::::::::ss  i::::::i s:::::::::::ss  
+AAAAAAA                   AAAAAAAnnnnnn    nnnnnn  aaaaaaaaaa  aaaallllllll      y:::::y           sssssssssss    iiiiiiii  sssssssssss    
+                                                                                y:::::y                                                    
+                                                                               y:::::y                                                     
+                                                                              y:::::y                                                      
+                                                                             y:::::y                                                       
+                                                                            yyyyyyy                                                        
+                                                                                                                                           
+                                                                                                                                           
+         Please note that this is only as accurate as per what is returned from an Update Center. Please validate your findings!
+==========================================================================================================================================
