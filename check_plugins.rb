@@ -6,7 +6,7 @@ require 'csv'
 
 # This should be externalized somehow as a param
 file_name = 'active.txt'
-current_version = '2.401.1.3'
+current_version = '2.346.4.1'
 target_version = '2.452.2.3'
 
 # Downloading files
@@ -31,17 +31,6 @@ def check_if_cap(plugin_name, json)
   end
 end
 
- # Get if there's an update that we can install either post- or pre-upgrade
-def check_for_update(start_ver, target_ver, plugin_name, json)
-  in_cap = check_if_cap(plugin_name, json)
-  icon = in_cap ? "*" : ""
-  if (target_ver > start_ver)
-    return "#{icon}$ #{plugin_name} has an update available. It is highly recommended you upgrade this plugin to #{target_ver.chomp} from #{start_ver.chomp} after upgrading."
-  else
-    return "#{icon}% #{plugin_name} should be fine post-upgrade as #{start_ver.chomp} is currently the best version available for your environment."
-  end
-end
-
 # Downloads JSON files from CB UC
 def download_json(version)
   # Check to see if we've already downloaded this JSON; download if not
@@ -53,15 +42,9 @@ def download_json(version)
   end 
 end
 
-# Return if it's JSON or text
-# TODO: Determine if this is necessary
-def get_plugins_list_type(filename)
-  def valid_json?(json)
-    JSON.parse(json)
-    return 'json'
-  rescue JSON::ParserError, TypeError => e
-    return 'text'
-  end
+def add_note(notes, new_note)
+  notes = notes.empty? ? new_note : "#{notes}\n#{new_note}"
+  return notes
 end
 
 # Startup ASCII ftw
@@ -76,14 +59,14 @@ download_json(current_version)
 target_json = JSON.parse(File.read("uc-#{target_version}.json"))
 current_json = JSON.parse(File.read("uc-#{current_version}.json"))
 
-# CSV headers
-headers = ["plugin_id", "installed_ver", "new_ver_#{current_version}", "new_ver_#{target_version}", "in_uc_#{current_version}", "in_uc_#{target_version}"]
-
 # Delete the CSV before starting.
 File.delete("plugin_updates.csv") if File.exist?("plugin_updates.csv")
 
 # Open CSV for writing
 csv = CSV.open("plugin_updates.csv", "w")
+
+# CSV headers
+headers = ["plugin_id", "installed_ver", "new_ver_#{current_version}", "new_ver_#{target_version}", "req_core_#{target_version}", "cap_#{current_version}", "cap_#{target_version}", "in_uc_#{current_version}", "in_uc_#{target_version}", "notes"]
 
 # Add headers
 csv << headers
@@ -100,6 +83,17 @@ plugin_list.each_line do |plugin|
   continue_target = true
   continue_current = true
 
+  target_plugin_ver = ""
+  target_required_core = ""
+  current_plugin_ver = ""
+  current_required_core = ""
+
+  # Checkers for Update Center
+  in_uc_current = true
+  in_uc_target = true
+  
+  notes = ""
+
   # Split each entry into two parts from the colon
   p_split = plugin.split(":")
   p_id = p_split[0]
@@ -110,7 +104,10 @@ plugin_list.each_line do |plugin|
     target_plugin_ver = target_json["plugins"][p_id]["version"]
     target_required_core = target_json["plugins"][p_id]["requiredCore"]
   rescue => e
-    puts "[#{target_version}][NOT_IN_UC] Plugin #{p_id} not found in Update Center for #{target_version}. Skipping..."
+    temp_note = "[#{target_version}][NOT_IN_UC] Plugin #{p_id} not found in Update Center for #{target_version}."
+    puts temp_note
+    notes = add_note(notes, temp_note)
+    in_uc_target = false
     continue_target = false
   end
 
@@ -119,7 +116,10 @@ plugin_list.each_line do |plugin|
     current_plugin_ver = current_json["plugins"][p_id]["version"]
     current_required_core = current_json["plugins"][p_id]["requiredCore"]
   rescue => e
-    puts "[#{current_version}][NOT_IN_UC] Plugin #{p_id} not found in Update Center for #{current_version}. Skipping..."
+    temp_note = "[#{current_version}][NOT_IN_UC] Plugin #{p_id} not found in Update Center for #{current_version}."
+    puts temp_note
+    notes = add_note(notes, temp_note)
+    in_uc_current = false
     continue_current = false
   end
 
@@ -128,45 +128,19 @@ plugin_list.each_line do |plugin|
   # ====================================
 
   if (continue_current)
-    current_ver_diff = (current_plugin_ver.to_s > p_ver.chomp) ? current_plugin_ver : "n/a"
+    current_ver_diff = (current_plugin_ver.to_s > p_ver.chomp.to_s) ? current_plugin_ver.to_s : "n/a"
   end
 
   if (continue_target)
-    target_ver_diff = (target_plugin_ver.to_s > p_ver.chomp) ? target_plugin_ver : "n/a"
+    target_ver_diff = (target_plugin_ver.to_s > p_ver.chomp.to_s) ? target_plugin_ver.to_s : "n/a"
+    if (target_required_core < "2.277.2.1")
+      notes = add_note(notes, "Target Version required Core pre-dates Tables-to-DIVs change. Check this plugin for compatibility!")
+    end
   end
 
   # Output our CSV to a file
-  csv << [p_id, current_plugin_ver, current_ver_diff.to_s, target_ver_diff.to_s, continue_target.to_s, continue_current.to_s]
+  csv << [p_id, p_ver.chomp, current_ver_diff.to_s, target_ver_diff.to_s, target_required_core, continue_target.to_s, continue_current.to_s, in_uc_current.to_s, in_uc_target.to_s, notes]
 end
 
 # Close the CSV for writing
 csv.close
-
-# File.open("active.txt", "r") do |file_handle|
-#   file_handle.each_line do |plugin|
-#     p_split = plugin.split(":")
-#     p_name = p_split[0]
-#     p_ver = p_split[1]
-#     #puts "NAME: #{p_name}, VER: #{p_ver}"
-#     begin
-#       target_remote_ver = target_json["plugins"][p_name]["version"]
-#       target_required_core = target_json["plugins"][p_name]["requiredCore"]
-#     rescue => e
-#       File.open('new_vers.txt', 'a') do |ver_file|
-#         ver_file.puts "& Plugin #{p_name} not found in Update Center. Skipping..."
-#       end
-#       next
-#     end
-#     if target_remote_ver.chomp != p_ver.chomp
-#       File.open('new_vers.txt', 'a') do |ver_file|
-#         if (target_required_core.chomp < "2.277.2.1")
-#           ver_file.puts "! #{p_name} is only supported on versions older than tables-to-divs! It is HIGHLY recommended this plugin be removed for compatibility and security concerns. [req_core] #{target_required_core}"
-#         elsif (target_required_core.chomp > target_version)
-#           ver_file.puts "@ #{p_name} requires a version greater than the target of #{target_version}. Manually validate the version needed for install. [req_core] #{target_required_core}"
-#         else
-#           ver_file.puts check_for_update(p_ver, target_remote_ver, p_name, p_json)
-#         end
-#       end
-#     end
-#   end
-# end
