@@ -3,3 +3,4 @@ active.txt
 *.json
 *.csv
 *.json*
+.DS_Store
