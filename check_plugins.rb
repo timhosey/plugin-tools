@@ -6,8 +6,8 @@ require 'csv'
 
 # This should be externalized somehow as a param
 file_name = 'active.txt'
-current_version = '2.346.4.1'
-target_version = '2.452.2.3'
+current_version = '2.401.3.4'
+target_version = '2.462.1.3'
 
 # Downloading files
 def http_download_uri(uri, filename)
@@ -44,6 +44,7 @@ end
 
 def add_note(notes, new_note)
   notes = notes.empty? ? new_note : "#{notes}\n#{new_note}"
+  puts new_note
   return notes
 end
 
@@ -91,6 +92,10 @@ plugin_list.each_line do |plugin|
   # Checkers for Update Center
   in_uc_current = true
   in_uc_target = true
+
+  # Checkers for CAP
+  in_cap_current = true
+  in_cap_target = true
   
   notes = ""
 
@@ -105,7 +110,6 @@ plugin_list.each_line do |plugin|
     target_required_core = target_json["plugins"][p_id]["requiredCore"]
   rescue => e
     temp_note = "[#{target_version}][NOT_IN_UC] Plugin #{p_id} not found in Update Center for #{target_version}."
-    puts temp_note
     notes = add_note(notes, temp_note)
     in_uc_target = false
     continue_target = false
@@ -117,9 +121,28 @@ plugin_list.each_line do |plugin|
     current_required_core = current_json["plugins"][p_id]["requiredCore"]
   rescue => e
     temp_note = "[#{current_version}][NOT_IN_UC] Plugin #{p_id} not found in Update Center for #{current_version}."
-    puts temp_note
     notes = add_note(notes, temp_note)
     in_uc_current = false
+    continue_current = false
+  end
+
+  # Check if target version is in CAP
+  begin
+    target_plugin_ver = target_json["offeredEnvelope"]["plugins"][p_id]["version"]
+  rescue => e
+    temp_note = "[#{target_version}][NOT_IN_CAP] Plugin #{p_id} not found in CloudBees Assurance Program for #{target_version}."
+    notes = add_note(notes, temp_note)
+    in_cap_target = false
+    continue_target = false
+  end
+
+  # Check if current version is in CAP
+  begin
+    current_plugin_ver = current_json["offeredEnvelope"]["plugins"][p_id]["version"]
+  rescue => e
+    temp_note = "[#{current_version}][NOT_IN_CAP] Plugin #{p_id} not found in CloudBees Assurance Program for #{current_version}."
+    notes = add_note(notes, temp_note)
+    in_cap_current = false
     continue_current = false
   end
 
@@ -139,7 +162,7 @@ plugin_list.each_line do |plugin|
   end
 
   # Output our CSV to a file
-  csv << [p_id, p_ver.chomp, current_ver_diff.to_s, target_ver_diff.to_s, target_required_core, continue_target.to_s, continue_current.to_s, in_uc_current.to_s, in_uc_target.to_s, notes]
+  csv << [p_id, p_ver.chomp, current_ver_diff.to_s, target_ver_diff.to_s, target_required_core, in_uc_current.to_s, in_uc_target.to_s, in_cap_current.to_s, in_cap_target.to_s, notes]
 end
 
 # Close the CSV for writing
