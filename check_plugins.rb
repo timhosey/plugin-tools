@@ -160,7 +160,7 @@ plugin_list.each_line do |plugin|
   end
 
   # Output our CSV to a file
-  csv << [p_id, p_ver.chomp, current_ver_diff.to_s, target_ver_diff.to_s, target_required_core, in_uc_current.to_s, in_uc_target.to_s, in_cap_current.to_s, in_cap_target.to_s, notes]
+  csv << [p_id, p_ver.chomp, current_ver_diff.to_s, target_ver_diff.to_s, target_required_core, in_cap_current.to_s, in_cap_target.to_s, in_uc_current.to_s, in_uc_target.to_s, notes]
 end
 
 # Close the CSV for writing
