@@ -133,7 +133,6 @@ plugin_list.each_line do |plugin|
     temp_note = "[#{target_version}][NOT_IN_CAP] Plugin #{p_id} not found in CloudBees Assurance Program for #{target_version}."
     notes = add_note(notes, temp_note)
     in_cap_target = false
-    continue_target = false
   end
 
   # Check if current version is in CAP
@@ -143,7 +142,6 @@ plugin_list.each_line do |plugin|
     temp_note = "[#{current_version}][NOT_IN_CAP] Plugin #{p_id} not found in CloudBees Assurance Program for #{current_version}."
     notes = add_note(notes, temp_note)
     in_cap_current = false
-    continue_current = false
   end
 
   # ====================================
@@ -151,11 +149,11 @@ plugin_list.each_line do |plugin|
   # ====================================
 
   if (continue_current)
-    current_ver_diff = (current_plugin_ver.to_s > p_ver.chomp.to_s) ? current_plugin_ver.to_s : "n/a"
+    current_ver_diff = (current_plugin_ver.to_s > p_ver.chomp.to_s) ? current_plugin_ver.to_s : "Up-to-Date"
   end
 
   if (continue_target)
-    target_ver_diff = (target_plugin_ver.to_s > p_ver.chomp.to_s) ? target_plugin_ver.to_s : "n/a"
+    target_ver_diff = (target_plugin_ver.to_s > p_ver.chomp.to_s) ? target_plugin_ver.to_s : "Up-to-Date"
     if (target_required_core < "2.277.2.1")
       notes = add_note(notes, "Target Version required Core pre-dates Tables-to-DIVs change. Check this plugin for compatibility!")
     end
