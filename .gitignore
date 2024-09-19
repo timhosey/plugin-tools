@@ -4,3 +4,4 @@ active.txt
 *.csv
 *.json*
 .DS_Store
+analysis.txt
