@@ -3,11 +3,13 @@
 require 'open-uri'
 require 'JSON'
 require 'csv'
+require 'FileUtils'
 
 # This should be externalized somehow as a param
 file_name = 'active.txt'
 current_version = '2.401.3.4'
 target_version = '2.462.1.3'
+target_csv = 'plugins.csv'
 
 # Downloading files
 def http_download_uri(uri, filename)
@@ -48,9 +50,6 @@ def add_note(notes, new_note)
   return notes
 end
 
-# Startup ASCII ftw
-File.foreach("analysis.txt") { |line| puts line }
-
 # Download the target version JSON
 download_json(target_version)
 # Download the JSON for the current version
@@ -61,10 +60,10 @@ target_json = JSON.parse(File.read("uc-#{target_version}.json"))
 current_json = JSON.parse(File.read("uc-#{current_version}.json"))
 
 # Delete the CSV before starting.
-File.delete("plugin_updates.csv") if File.exist?("plugin_updates.csv")
+File.delete(target_csv) if File.exist?(target_csv)
 
 # Open CSV for writing
-csv = CSV.open("plugin_updates.csv", "w")
+csv = CSV.open(target_csv, "w")
 
 # CSV headers
 headers = ["plugin_id", "installed_ver", "new_ver_#{current_version}", "new_ver_#{target_version}", "req_core_#{target_version}", "cap_#{current_version}", "cap_#{target_version}", "in_uc_#{current_version}", "in_uc_#{target_version}", "notes"]
