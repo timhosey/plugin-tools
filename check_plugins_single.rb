@@ -51,12 +51,9 @@ end
 
 # Download the target version JSON
 download_json(target_version)
-# Download the JSON for the current version
-download_json(current_version)
 
 # Read the JSON files
 target_json = JSON.parse(File.read("uc-#{target_version}.json"))
-current_json = JSON.parse(File.read("uc-#{current_version}.json"))
 
 # Delete the CSV before starting.
 File.delete(target_csv) if File.exist?(target_csv)
